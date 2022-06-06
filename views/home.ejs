@@ -1,0 +1,17 @@
+<h2>Hyper Store</h2>
+
+<h4>Products</h4>
+<% products.forEach(function(product) { %>
+<div class="responsive">
+  <div class="gallery">
+    <a target="_blank" href="#">
+      <img src="/img/blank.jpg" alt="<%- product.productName %>" width="600" height="400">
+    </a>
+    <div class="desc"><%- product.productName %></div>
+  </div>
+</div>
+<% }); %>
+
+
+
+
