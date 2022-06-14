@@ -1,0 +1,70 @@
+<div class="row mt-5">
+    <div class="col-md-6 m-auto">
+      <div class="card card-body">
+        <h1 class="text-center mb-3">
+          <i class="fas fa-book" style="--fa-primary-color: lightseagreen; --fa-secondary-color: linen; --fa-secondary-opacity: 1.0;"></i> 
+          Personel informations
+        </h1>
+        <%- include ("../partials/messages") %>
+        <form action="/client/info" method="POST">
+          
+            <div class="form-group">
+                <label for="firstname">First name</label>
+                <input
+                  type="text"
+                  id="firstname"
+                  name="firstname"
+                  class="form-control"
+                  placeholder="Your first name"
+                  value="<%= typeof firstname != 'undefined' ? firstname : '' %>"
+                />
+              </div>
+              <div class="form-group">
+                <label for="lastname">Last name</label>
+                <input
+                  type="text"
+                  id="lastname"
+                  name="lastname"
+                  class="form-control"
+                  placeholder="Your last name"
+                  value="<%= typeof lastname != 'undefined' ? lastname : '' %>"
+                />
+              </div>
+            <div class="form-group">
+            <label for="birthdate">Birthdate</label>
+            <input
+              type="date"
+              id="birthdate"
+              name="birthdate"
+              class="form-control"
+              
+              value="<%= typeof birthdate != 'undefined' ? birthdate : '' %>"
+            />
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone number</label><p></p>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              class="form-control"
+              placeholder="Enter your phone number"
+              value="<%= typeof phone != 'undefined' ? phone : '' %>"
+            />
+          </div>
+         
+          <button type="submit" class="btn btn-primary btn-block">
+            Save
+          </button>
+        </form>
+       
+      </div>
+    </div>
+  </div>
+  <script>
+    const phoneInputField = document.querySelector("#phone");
+    const phoneInput = window.intlTelInput(phoneInputField, {
+      utilsScript:
+        "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+    });
+  </script>

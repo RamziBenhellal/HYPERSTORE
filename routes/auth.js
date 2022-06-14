@@ -23,6 +23,9 @@ res.render('auth/login',{layout:'./layouts/main'})
 
 // Register Page
 router.get('/register',(req,res) => {
+    if(req.session.authenticated){
+        res.redirect('/')
+    }
     res.render('auth/register',{layout:'./layouts/main'})
 })
 
