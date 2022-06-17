@@ -32,7 +32,7 @@
           <% } %>
           <% if(locals.user){ %>
           <li class="user"><a href="/auth/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
-          <li class="user"><a href="#"><span class="glyphicon glyphicon-log-in"></span> <%= locals.user.email %></a></li>
+          <li class="user"><a href="/user/dashboard"><span class="glyphicon glyphicon-log-in"></span> <%= locals.user.email %></a></li>
           <% } %>
         </ul>
       </div>

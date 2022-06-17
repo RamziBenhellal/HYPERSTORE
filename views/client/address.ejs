@@ -1,0 +1,74 @@
+<div class="row mt-5">
+    <div class="col-md-6 m-auto">
+      <div class="card card-body">
+        <h1 class="text-center mb-3">
+          <i class="fas fa-envelope" style="--fa-primary-color: lightseagreen; --fa-secondary-color: linen; --fa-secondary-opacity: 1.0;"></i> 
+          Delivery Address
+        </h1>
+        <%- include ("../partials/messages") %>
+        <form action="/client/address" method="POST">
+          
+            <div class="form-group">
+                <label for="street">Street</label>
+                <input
+                  type="text"
+                  id="street"
+                  name="street"
+                  class="form-control"
+                  placeholder="Street"
+                  value="<%= typeof street != 'undefined' ? street : '' %>"
+                />
+              </div>
+              <div class="form-group">
+                <label for="hausnumber">Haus number</label>
+                <input
+                  type="text"
+                  id="hausnumber"
+                  name="hausnumber"
+                  class="form-control"
+                  placeholder="Haus number"
+                  value="<%= typeof hausnumber != 'undefined' ? hausnumber : '' %>"
+                />
+              </div>
+            <div class="form-group">
+            <label for="postalcode">Postal code</label>
+            <input
+              type="text"
+              id="postalcode"
+              name="postalcode"
+              class="form-control"
+              placeholder="Postal code"
+              value="<%= typeof postalcode != 'undefined' ? postalcode : '' %>"
+            />
+          </div>
+          <div class="form-group">
+            <label for="city">City</label>
+            <input
+              type="text"
+              id="city"
+              name="city"
+              class="form-control"
+              placeholder="City"
+              value="<%= typeof city != 'undefined' ? city : '' %>"
+            />
+          </div>
+          <div class="form-group">
+            <label for="phone">Land</label><p></p>
+            <input
+              type="text"
+              id="land"
+              name="land"
+              class="form-control"
+              placeholder="Land"
+              value="<%= typeof land != 'undefined' ? land : '' %>"
+            />
+          </div>
+         
+          <button type="submit" class="btn btn-primary btn-block">
+            Save
+          </button>
+        </form>
+       
+      </div>
+    </div>
+  </div>
