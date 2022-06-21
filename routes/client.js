@@ -1,33 +1,42 @@
 const express = require('express')
+const AddressService = require('../service/AddressService')
 const router = express.Router()
 const mysqlDb = require('../config/db').db
+const clientService = require('../service/ClientService')
 
 
 
 // Register Client info get
-router.get('/info',(req,res)=>{
+router.get('/info',async function(req,res){
     if(!req.session.authenticated){
         res.redirect('/')
     }
     else{
-        let sql = `SELECT * FROM Client WHERE userId = '${req.session.user.userId}' `
-        let query = mysqlDb.query(sql, (err,result) =>{
-        if(err)   errors.push({msg:err})
+        
+        try {
+        
+        let client = await clientService.findByUserId(req.session.user.userId)
+       
 
-        if(result[0] )
+        if(client )
         {
-            const firstname =result[0].firstname
-            const lastname = result[0].lastname
-            const birthdate = result[0].birthdate
-            const phone = result[0].phone
+            console.log(client)
+            const firstname =client.firstname
+            const lastname = client.lastname
+            const birthdate = client.birthdate
+            const phone = client.phone
 
             res.render('client/info',{layout:'./layouts/main',firstname,lastname,birthdate,phone})
         }
         else{
             res.render('client/info',{layout:'./layouts/main'})
         }
+    } catch (err) {
+        errors.push({msg:err});
+        next(err);
+    }
        
-    })
+    
 } 
     
     
@@ -35,7 +44,7 @@ router.get('/info',(req,res)=>{
 })
 
 // Register Client info post
-router.post('/info',(req,res)=>{
+router.post('/info',async function(req,res,next){
     if(!req.session.authenticated){
         res.redirect('/')
     }
@@ -44,12 +53,9 @@ router.post('/info',(req,res)=>{
     const {firstname, lastname,birthdate,phone} = req.body;
     let errors = [];
 
-    
-
     // Check required field
     if(!firstname || !lastname || !birthdate || !phone){
         errors.push({msg:'Please fill in all field'});
-        console.log(user.userId)
     }
 
 
@@ -58,99 +64,103 @@ router.post('/info',(req,res)=>{
         res.render('client/info',{layout:'./layouts/main',errors,firstname,lastname,birthdate,phone})
       }
      else{
-        let sql = `SELECT * FROM Client WHERE userId = '${req.session.user.userId}' `
-        let query = mysqlDb.query(sql, (err,result) =>{
-        if(err)   errors.push({msg:err})
+        let client
+        try {
+        client = await clientService.findByUserId(req.session.user.userId)
+    } catch (err) {
+        errors.push({msg:err});
+        next(err);
+    }
 
-        if(result[0] )
+        if(client )
         { 
-            let clt = {firstname:firstname,lastname:lastname,
-                birthdate:birthdate, phone:phone}
-            let sql = `Update Client SET ? WHERE userId = ${req.session.user.userId}`
-            let query = mysqlDb.query(sql,clt, (err,result) =>{
-                if(err) {  errors.push({msg:err})
-                res.render('client/info',{layout:'./layouts/main',errors,firstname,lastname,birthdate,phone})      
+            let clt  = [firstname,lastname,birthdate,phone]
+            let result
+            try{    
+            result = await clientService.updateByUserId(clt,req.session.user.userId)
+            if(result){req.flash('success_msg','Informations updated')
+              res.redirect('/user/dashboard');}
+            else{ req.flash('error_msg','No Informations are saved')}  
+            }
+            catch(err){
+                 errors.push({msg:err})
+                res.render('client/info',{layout:'./layouts/main',errors,firstname,lastname,birthdate,phone})
+            }      
 
             }
-                else{req.flash(
-                    'success_msg',
-                    'Informations updated'
-                  )
-                  res.redirect('/user/dashboard');     
-                }
-
-        })  
-        }
 
         else {
-            let clt = {userId:req.session.user.userId,firstname:firstname,lastname:lastname,
-                birthdate:birthdate, phone:phone}
-            let sql = 'INSERT INTO Client SET ?'
-            let query = mysqlDb.query(sql, clt,(err,result) =>{
-                if(err) {  errors.push({msg:err})
-                res.render('client/info',{layout:'./layouts/main',errors,firstname,lastname,birthdate,phone})
+            let clt  = [req.session.user.userId,firstname,lastname,birthdate,phone]
+            let result
+            try{    
+            result = await clientService.insert(clt)
+            if(result){req.flash('success_msg','Informations updated')
+              res.redirect('/user/dashboard');}
+            else{ req.flash('error_msg','No Informations are saved')}  
             }
-                else{req.flash(
-                    'success_msg',
-                    'Informations saved'
-                  )
-                  res.redirect('/user/dashboard');
-                }
-                        
+            catch(err){
+                 errors.push({msg:err})
+                res.render('client/info',{layout:'./layouts/main',errors,firstname,lastname,birthdate,phone})
+            }      
 
-        })  
-        }
-        
-    })
-    
+            }
+ 
      } 
 
 })
 
 //  Client delivery address get
-router.get('/address',(req,res)=>{
+router.get('/address',async function(req,res,next){
     if(!req.session.authenticated){
         res.redirect('/')
     }
     else{
-        let sql = `SELECT idAddress FROM Client WHERE userId = '${req.session.user.userId}' `
-        let query = mysqlDb.query(sql, (err,result) =>{
-        if(err)   errors.push({msg:err})
+        let client
+        try {
+        client = await clientService.findByUserId(req.session.user.userId)
+    } catch (err) {
+        errors.push({msg:err});
+        next(err);
+    }
 
-        if(result[0].idAddress )
+        if(client.idAddress )
         {
-            console.log(result[0])
-        let sql = `SELECT * FROM Address WHERE idAddress = '${result[0].idAddress}' `
-        let query = mysqlDb.query(sql, (err,adr) =>{
-        if(err)   errors.push({msg:err})
-        if(adr[0] )
+        let address
+        try {
+        address = await AddressService.findById(client.idAddress)
+        } catch (err) {
+        errors.push({msg:err});
+        next(err);
+           }
+
+
+        if(address )
         {
-        const street =adr[0].street
-        const hausnumber = adr[0].hausNumber
-        const postalcode = adr[0].postalCode
-        const city = adr[0].city
-        const land = adr[0].land
+        const street = address.street
+        const hausnumber = address.hausNumber
+        const postalcode = address.postalCode
+        const city = address.city
+        const land = address.land
 
             res.render('client/address',{layout:'./layouts/main',street,hausnumber,postalcode,city,land})
         }
         else{
             res.render('client/address',{layout:'./layouts/main'})
         }
-    })
-            
+    
         }
         else{
             res.render('client/address',{layout:'./layouts/main'})
         }
        
-    })
+    
 } 
 
 })
 
 
 // Client address post
-router.post('/address',(req,res)=>{
+router.post('/address',async function(req,res){
     if(!req.session.authenticated){
         res.redirect('/')
     }
@@ -168,60 +178,57 @@ router.post('/address',(req,res)=>{
 
 
     if (errors.length > 0) {
-        res.render('client/info',{layout:'./layouts/main',errors,street,hausnumber,postalcode,city,land})
+        res.render('client/address',{layout:'./layouts/main',errors,street,hausnumber,postalcode,city,land})
       }
      else{
-        let sql = `SELECT idAddress FROM Client WHERE userId = '${req.session.user.userId}' `
-        let query = mysqlDb.query(sql, (err,result) =>{
-        if(err)   errors.push({msg:err})
+        let client
+        try {
+        client = await clientService.findByUserId(req.session.user.userId)
+    } catch (err) {
+        errors.push({msg:err});
+        next(err);
+    }
 
-        if(result[0].idAddress )
+   
+
+        if(client.idAddress )
         {
-            let sql = `SELECT * FROM Address WHERE idAddress = '${result[0].idAddress}' `
-        let query = mysqlDb.query(sql, (err,adr) =>{
-        if(err)   errors.push({msg:err})
-        let adrs = {street:street,hausnumber:hausnumber,
-            postalcode:postalcode, city:city,land:land}
-        let sql = `Update Address SET ? WHERE idAddress = ${result[0].idAddress}`
-        let query = mysqlDb.query(sql,adrs, (err,r) =>{
-            if(err) {  errors.push({msg:err})
-            res.render('client/address',{layout:'./layouts/main',errors,street,hausnumber,postalcode,city,land})      
-        }
-            else{req.flash(
-                'success_msg',
-                'Informations updated'
-              )
-              res.redirect('/user/dashboard');     
+            
+            let address  = [street,hausnumber,postalcode,city,land]
+            let result
+            try{
+               
+            result = await AddressService.update(address,client.idAddress)
+            if(result){req.flash('success_msg','Informations updated')
+              res.redirect('/user/dashboard');}
+            else{ req.flash('error_msg','No Informations are saved')}  
             }
-        })
-
-        })
+            catch(err){
+                 errors.push({msg:err})
+                res.render('client/address',{layout:'./layouts/main',errors,street,hausnumber,postalcode,city,land})
+            }
 
         }
 
         else {
-            let adrs = {street:street,hausnumber:hausnumber,
-                postalcode:postalcode, city:city,land:land}
-            let sql = 'INSERT INTO Address SET ?'
-            let query = mysqlDb.query(sql, adrs,(err,r) =>{
-                if(err) {  errors.push({msg:err})
-                res.render('client/address',{layout:'./layouts/main',errors,street,hausnumber,postalcode,city,land})      
+            let address  = [street,hausnumber,postalcode,city,land]
+            let result 
+            try{    
+            result = await AddressService.insert(address,req.session.user.userId)
+           
+            if(result){
+                
+              req.flash('success_msg','Informations updated')
+              res.redirect('/user/dashboard');
             }
-                else{
-                    clt = {idAddress:r.insertId}
-            let sql = `Update Client SET ? WHERE userId = ${req.session.user.userId}`
-            let query = mysqlDb.query(sql,clt, (err,rs) =>{
-                if(err)   errors.push({msg:err})
-            }) 
-                    req.flash(
-                    'success_msg',
-                    'Informations saved'
-                  )
-                  res.redirect('/user/dashboard');
-                }
-            })
+            else{ req.flash('error_msg','No Informations are saved')}
+        }
+            catch(err){
+                 errors.push({msg:err})
+                res.render('client/address',{layout:'./layouts/main',errors,street,hausnumber,postalcode,city,land})
+            }  
         }           
-    })
+   
 }
 })
 
