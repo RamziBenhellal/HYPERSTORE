@@ -1,11 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const UserService = require('../service/UserService')
-const User = require('../model/User')
 const bcrypt = require('bcryptjs')
-const mysqlDb = require('../config/db').db
 const passport = require('passport');
-const { redirect } = require('express/lib/response')
 const session = require('express-session');
  
 
@@ -30,7 +27,7 @@ router.get('/register',(req,res) => {
 })
 
 // Register Page
-router.post('/register',(req,res) => {
+router.post('/register',async function(req,res)  {
     const {email, password,password2} = req.body;
     let errors = [];
 
@@ -55,19 +52,23 @@ router.post('/register',(req,res) => {
         res.render('auth/register',{layout:'./layouts/main',errors,email,password,password2})
       }
     else{
-        let sql = `SELECT * FROM User WHERE email = '${email}' `
-        let query = mysqlDb.query(sql, (err,result) =>{
-        if(err)   errors.push({msg:err})
         
-        if(result[0] )
+        let user
+        try {
+            user = await UserService.find(email)
+        } catch (err) {
+            errors.push({ msg: err })
+            res.render('auth/login',{layout:'./layouts/main',errors,email,password})
+        }
+        if(user)
         { errors.push({ msg: 'Email already exists' })
         res.render('auth/register',{layout:'./layouts/main',errors,email,password,password2})
         }
         else{
-            bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.genSalt(10, async function(err, salt)  {
                 bcrypt.hash(password, salt, (err, hash) => {
                   if (err) throw err;
-                 UserService.save(email,hash)
+                 UserService.insert(email,hash)
                       req.flash(
                         'success_msg',
                         'You are now registered and can log in'
@@ -77,14 +78,13 @@ router.post('/register',(req,res) => {
                 });
               });
         }
-        })
           
         }
  
 })
 
 // Login
-router.post('/login', (req, res) => {
+router.post('/login', async function(req, res) {
 
     if(req.session.authenticated){
         res.redirect('/')
@@ -92,20 +92,27 @@ router.post('/login', (req, res) => {
 
     const {email, password} = req.body;
     let errors = []
-    let sql = `SELECT * FROM User WHERE email = '${email}' `
-    let query = mysqlDb.query(sql, (err,result) =>{
-    if(err)   throw err
+    let user
     
-    if(!result[0] )
-    { errors.push({ msg: 'Incorrect Email or Password ' })
-    res.render('auth/login',{layout:'./layouts/main',errors,email,password})
+    try {
+        user = await UserService.find(email)
+    } catch (err) {
+        errors.push({ msg: err })
+        res.render('auth/login',{layout:'./layouts/main',errors,email,password})
+    }
+    
+    
+    if(!user )
+    { 
+        errors.push({ msg: 'Incorrect Email or Password ' })
+        res.render('auth/login',{layout:'./layouts/main',errors,email,password})
     }
     else{
-        bcrypt.compare(password,result[0].password,(err,isMatch) =>{
+        bcrypt.compare(password,user.password,(err,isMatch) =>{
             if(err) throw err
             if(isMatch){
                 req.session.authenticated = true
-                req.session.user = result[0]
+                req.session.user = user
                 res.redirect('/')
             }else{
                 errors.push({ msg: 'Incorrect Email or Password ' })
@@ -114,7 +121,6 @@ router.post('/login', (req, res) => {
 
         })
     }
-})
 
   });
   

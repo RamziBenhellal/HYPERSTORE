@@ -1,7 +1,6 @@
 const express = require('express')
 const AddressService = require('../service/AddressService')
 const router = express.Router()
-const mysqlDb = require('../config/db').db
 const clientService = require('../service/ClientService')
 
 

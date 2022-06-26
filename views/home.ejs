@@ -3,7 +3,7 @@
 <% products.forEach(function(product) { %>
 <div class="responsive">
   <div class="gallery">
-    <a target="_blank" href="#">
+    <a  href="/product/details/<%= product.idProduct %>">
       <img src="/img/blank.jpg" alt="<%- product.productName %>" width="600" height="400">
     </a>
     <div class="desc"><%- product.productName %></div>

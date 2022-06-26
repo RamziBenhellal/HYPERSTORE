@@ -1,6 +1,7 @@
 const express = require('express')
 const dotenv = require('dotenv')
 const path = require('path')
+const bodyParser = require('body-parser')
 const connectMysql = require('./config/db').connectMysql
 const flash = require('connect-flash');
 const session = require('express-session');
@@ -28,7 +29,8 @@ app.use(expressLayouts)
 app.set('view engine', 'ejs') 
 
 // Body Parser
-app.use(express.urlencoded({extended:true}))
+app.use(bodyParser.urlencoded({extended:true}))
+app.use(bodyParser.json())
 
 // Express session
 app.use(
@@ -71,6 +73,7 @@ app.use('/',require('./routes/index'))
 app.use('/auth',require('./routes/auth'))
 app.use('/client',require('./routes/client'))
 app.use('/user',require('./routes/user'))
+app.use('/product',require('./routes/product'))
 
 
 
