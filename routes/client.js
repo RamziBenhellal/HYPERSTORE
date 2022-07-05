@@ -19,7 +19,6 @@ router.get('/info',async function(req,res){
 
         if(client )
         {
-            console.log(client)
             const firstname =client.firstname
             const lastname = client.lastname
             const birthdate = client.birthdate

@@ -26,7 +26,9 @@ require('./config/passport')(passport);
 
 // EJS
 app.use(expressLayouts)
-app.set('view engine', 'ejs') 
+app.set('view engine', 'ejs')
+app.set('layout', 'layouts/main');
+
 
 // Body Parser
 app.use(bodyParser.urlencoded({extended:true}))
@@ -57,6 +59,7 @@ app.use(passport.session());
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
     res.locals.user = req.session.user;
+    res.locals.cartQuantity = req.session.cartQuantity
     res.locals.authenticated = req.session.authenticated
     next();
   });
@@ -74,6 +77,8 @@ app.use('/auth',require('./routes/auth'))
 app.use('/client',require('./routes/client'))
 app.use('/user',require('./routes/user'))
 app.use('/product',require('./routes/product'))
+app.use('/purshase',require('./routes/purshase'))
+app.use('/cart',require('./routes/cart'))
 
 
 

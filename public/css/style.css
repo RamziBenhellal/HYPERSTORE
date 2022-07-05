@@ -26,13 +26,6 @@ ul {
     float: right;
   }
 
-  div.gallery {
-    border: 1px solid #ccc;
-  }
-  
-  div.gallery:hover {
-    border: 1px solid #777;
-  }
   
   div.gallery img {
     width: 100%;
@@ -125,11 +118,7 @@ ul {
       -webkit-animation-duration: .3s;
               animation-duration: .3s; }
   
-  .card {
-    margin-top: 50px;
-    background: #eee;
-    padding: 3em;
-    line-height: 1.5em; }
+  
   
   @media screen and (min-width: 997px) {
     .wrapper {
@@ -235,4 +224,18 @@ ul {
       opacity: 1;
       -webkit-transform: scale(1);
               transform: scale(1); } }
+
+/* style of purshase page  */
+
+.gradient-custom {
+  /* fallback for old browsers */
+  background: #f5ecff;
+  
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: -webkit-linear-gradient(to right, rgb(254, 254, 255), rgb(228, 230, 233));
+  
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: linear-gradient(to right, rgb(251, 249, 252), rgb(230, 232, 236))
+  }
+
   

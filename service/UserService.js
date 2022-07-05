@@ -22,8 +22,11 @@ class UserService {
         let sql = `INSERT INTO User(email,password) VALUES (?,?)`
         let user = [email,password]
         const result = await db.query(sql,user)
+
+        let sql2 = `INSERT INTO Cart(userId) VALUES (${result.insertId})`
+        const result2 = await db.query(sql2)
     
-        if(result.affectedRows > 0){
+        if(result.affectedRows > 0 && result2.affectedRows){
             return true
         }
         return false

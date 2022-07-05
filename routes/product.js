@@ -8,11 +8,8 @@ const colorService = require('../service/ColorService')
 // /product/details  GET
 router.get('/details/:id',async function(req,res){
 
-   
-
     let product
     let articles
-    let sizes
     let colors = new Map()
     try {
     product = await productService.find(req.params.id)
@@ -22,7 +19,6 @@ router.get('/details/:id',async function(req,res){
         let color = await colorService.find(articles[i].idColor)
         colors.set(color.idColor,color)
     }
-    console.log(colors)
     
 } 
     catch (error) {
@@ -43,19 +39,17 @@ router.post('/details/:id',async function(req,res){
         for (let i = 0; i < articles.length; i++) {
             let size = await sizeService.find(articles[i].idSize)
             sizes.push(size)
-            
         }
         let rst = '<h5 class="sizes">sizes: '
         sizes.forEach(size => {
-            rst = rst +  ' <input  name="size" type="radio" titel= "size" value="'+size.idSize+'"/> '+size.sign + '\t ' 
+            rst = rst +  '<input  name="size" type="radio" titel= "size" value="'+size.idSize+'"/> '+size.sign + '\t ' 
         });
         rst += '</h5>'
-        
+        rst+= '<label for="quantity">Quantity</label><input type="number" name="quantity" id="quantity" value="1">'
 
-        
+
         res.send({html: rst})  
-      
-        
+ 
         
     } catch (error) {
         console.log(error)

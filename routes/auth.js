@@ -1,10 +1,11 @@
 const express = require('express')
 const router = express.Router()
-const UserService = require('../service/UserService')
 const bcrypt = require('bcryptjs')
 const passport = require('passport');
 const session = require('express-session');
- 
+
+const UserService = require('../service/UserService')
+const cartService = require('../service/CartService')
 
 
 
@@ -69,6 +70,7 @@ router.post('/register',async function(req,res)  {
                 bcrypt.hash(password, salt, (err, hash) => {
                   if (err) throw err;
                  UserService.insert(email,hash)
+
                       req.flash(
                         'success_msg',
                         'You are now registered and can log in'
@@ -108,11 +110,12 @@ router.post('/login', async function(req, res) {
         res.render('auth/login',{layout:'./layouts/main',errors,email,password})
     }
     else{
-        bcrypt.compare(password,user.password,(err,isMatch) =>{
+        bcrypt.compare(password,user.password,async function(err,isMatch) {
             if(err) throw err
             if(isMatch){
                 req.session.authenticated = true
                 req.session.user = user
+                req.session.cartQuantity = await cartService.articleNumbre(user.userId)
                 res.redirect('/')
             }else{
                 errors.push({ msg: 'Incorrect Email or Password ' })

@@ -17,6 +17,15 @@ class AddressService{
         return result[0]
     }
 
+    static async findByUserId(id){
+        
+        let sql = `SELECT * FROM Address WHERE Address.idAddress = (select idAddress FROM Client WHERE Client.userId = ${id})`
+        let sql2 = `SELECT * FROM Address JOIN Client ON Address.idAddress = Client.idAddress AND Client.userId = ${id}`
+        const result = await db.query(sql2)
+    
+        return result[0]
+    }
+
     static async insert(address,id){
         let sql = `INSERT INTO Address(street,hausNumber,postalCode,city,land) VALUES (?,?,?,?,?)`
         const result = await db.query(sql,address)
